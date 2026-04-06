@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URBANODE — The R2I Protocol</title>
+<meta name="description" content="URBANODE is the open communication protocol for Robot-to-Infrastructure interaction. Secure, authenticated, universal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0b;
+  --bg-elevated: #111113;
+  --bg-card: #161618;
+  --border: #222225;
+  --border-bright: #2a2a2e;
+  --text-primary: #e8e8ec;
+  --text-secondary: #8b8b96;
+  --text-muted: #56565e;
+  --accent: #00d4aa;
+  --accent-dim: #00d4aa22;
+  --accent-glow: #00d4aa15;
+  --red: #ff4d4d;
+  --amber: #ffaa00;
+  --blue: #4d9eff;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ═══ GRID NOISE BACKGROUND ═══ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 100%, #0a1a1500, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══ NAVIGATION ═══ */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0a0a0bdd;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.nav-logo-mark {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+
+.nav-logo-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text-primary); }
+
+.nav-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 0.2rem 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 2rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-overline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  max-width: 900px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+
+.hero h1 .accent { color: var(--accent); }
+
+.hero-sub {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin-top: 1.5rem;
+  line-height: 1.7;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.8s forwards;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: #0a0a0b;
+  padding: 0.85rem 1.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #00e8bb;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px var(--accent-dim);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0.85rem 1.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid var(--border-bright);
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-muted);
+  background: var(--bg-elevated);
+}
+
+/* ═══ PROTOCOL STRIP ═══ */
+.protocol-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1.5rem 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.protocol-strip-inner {
+  display: flex;
+  gap: 3rem;
+  animation: scroll 25s linear infinite;
+  width: max-content;
+}
+
+.protocol-strip-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.protocol-strip-item .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══ SECTIONS ═══ */
+section {
+  position: relative;
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* ═══ PROBLEM ═══ */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+
+.problem-cell {
+  background: var(--bg-card);
+  padding: 2rem;
+}
+
+.problem-cell .icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.problem-cell h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.problem-cell p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.problem-cell .status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--red);
+  letter-spacing: 1px;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.problem-cell .status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+/* ═══ HOW IT WORKS — FLOW ═══ */
+.flow-container {
+  margin-top: 3rem;
+}
+
+.flow-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 0;
+}
+
+.flow-step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 1px;
+  padding-top: 1.8rem;
+  text-align: right;
+}
+
+.flow-step {
+  border-left: 1px solid var(--border);
+  padding: 1.5rem 0 1.5rem 1.5rem;
+  position: relative;
+}
+
+.flow-step::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 2rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.flow-step h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.flow-step p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.flow-step .tech {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+/* ═══ ARCHITECTURE DIAGRAM ═══ */
+.arch-diagram {
+  margin-top: 3rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 3rem 2rem;
+}
+
+.arch-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.arch-layer {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.arch-layer:last-child { border-bottom: none; }
+
+.arch-layer-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: right;
+  padding-right: 1.5rem;
+  border-right: 2px solid var(--accent);
+}
+
+.arch-layer-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.arch-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+}
+
+/* ═══ NODE TYPES ═══ */
+.nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+
+.node-card {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  transition: background 0.2s;
+}
+
+.node-card:hover { background: var(--bg-elevated); }
+
+.node-card .node-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.node-card h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.node-card .node-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ═══ EMITTERS ═══ */
+.emitters-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.emitter-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.emitter-card:hover {
+  border-color: var(--border-bright);
+  background: var(--bg-card);
+}
+
+.emitter-card .em-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+.emitter-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+.emitter-card p { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ═══ SECURITY ═══ */
+.security-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.sec-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.75rem;
+}
+
+.sec-card .sec-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+.sec-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.sec-card p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ═══ DATA INSIGHT ═══ */
+.data-section {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 3rem;
+  margin-top: 3rem;
+  background: linear-gradient(135deg, var(--accent-glow), transparent 60%);
+  position: relative;
+  overflow: hidden;
+}
+
+.data-section::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.data-section h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.data-section p {
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+.data-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  max-width: 700px;
+}
+
+.data-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.data-list-item::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ═══ CONTACT ═══ */
+.contact-section {
+  text-align: center;
+  padding: 8rem 2rem;
+}
+
+.contact-section .section-title {
+  margin-bottom: 1rem;
+}
+
+.contact-section .section-desc {
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+.contact-email {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-dim);
+  padding-bottom: 2px;
+  transition: border-color 0.2s;
+}
+
+.contact-email:hover { border-color: var(--accent); }
+
+/* ═══ FOOTER ═══ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-left {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.footer-right {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-right span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.footer-right .live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  nav { padding: 1rem; }
+  .nav-links { gap: 1rem; }
+  .nav-links a { font-size: 0.75rem; }
+  
+  .hero { padding: 7rem 1.5rem 3rem; }
+  section { padding: 4rem 1.5rem; }
+  
+  .problem-grid { grid-template-columns: 1fr; }
+  .emitters-row { grid-template-columns: 1fr 1fr; }
+  .security-features { grid-template-columns: 1fr; }
+  .data-list { grid-template-columns: 1fr; }
+  .nodes-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  
+  .arch-layer { grid-template-columns: 1fr; gap: 0.5rem; }
+  .arch-layer-label { text-align: left; border-right: none; border-bottom: 2px solid var(--accent); padding: 0 0 0.5rem 0; }
+  
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+  .footer-right { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 480px) {
+  .emitters-row { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">U</div>
+    <span class="nav-logo-text">Urbanode</span>
+  </a>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#protocol">Protocol</a>
+    <a href="#nodes">Coverage</a>
+    <a href="#security">Security</a>
+    <a href="#contact">Contact</a>
+    <span class="nav-badge">Patent Pending</span>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-overline">Robot-to-Infrastructure Protocol</div>
+  <h1>Urban infrastructure<br>wasn't built to talk<br>to <span class="accent">machines</span>.</h1>
+  <p class="hero-sub">URBANODE is the open communication protocol that enables autonomous emitters — delivery robots, humanoid robots, drones, and accessibility devices — to securely interact with urban infrastructure. From the street to the apartment door.</p>
+  <div class="hero-actions">
+    <a href="#contact" class="btn-primary">Request SDK Access ↗</a>
+    <a href="#protocol" class="btn-secondary">Read the spec</a>
+  </div>
+</section>
+
+<!-- ═══ PROTOCOL STRIP ═══ -->
+<div class="protocol-strip">
+  <div class="protocol-strip-inner">
+    <span class="protocol-strip-item"><span class="dot"></span>ECDSA P-256</span>
+    <span class="protocol-strip-item"><span class="dot"></span>TLS 1.3 mTLS</span>
+    <span class="protocol-strip-item"><span class="dot"></span>5D Permission Matrix</span>
+    <span class="protocol-strip-item"><span class="dot"></span>BLE / UWB / NFC</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Embedded Safety Rules</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Real-Time State Monitoring</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Automatic Settlement</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Predictive Maintenance</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Urban Digital Twin</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Offline Node Support</span>
+    <!-- duplicate for seamless loop -->
+    <span class="protocol-strip-item"><span class="dot"></span>ECDSA P-256</span>
+    <span class="protocol-strip-item"><span class="dot"></span>TLS 1.3 mTLS</span>
+    <span class="protocol-strip-item"><span class="dot"></span>5D Permission Matrix</span>
+    <span class="protocol-strip-item"><span class="dot"></span>BLE / UWB / NFC</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Embedded Safety Rules</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Real-Time State Monitoring</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Automatic Settlement</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Predictive Maintenance</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Urban Digital Twin</span>
+    <span class="protocol-strip-item"><span class="dot"></span>Offline Node Support</span>
+  </div>
+</div>
+
+<!-- ═══ PROBLEM ═══ -->
+<section id="problem">
+  <div class="section-label">01 — The Problem</div>
+  <h2 class="section-title">Every interaction requires<br>a human hand.</h2>
+  <p class="section-desc">Urban infrastructure was designed for physical human interaction. Autonomous machines can navigate streets but cannot open a door, call an elevator, request a pedestrian phase, or ring a doorbell.</p>
+
+  <div class="problem-grid">
+    <div class="problem-cell">
+      <div class="icon">🚦</div>
+      <h3>Traffic signals</h3>
+      <p>Pedestrian buttons require physical pressure. Robots wait indefinitely or cross illegally.</p>
+      <div class="status">No digital interface</div>
+    </div>
+    <div class="problem-cell">
+      <div class="icon">🚪</div>
+      <h3>Building access</h3>
+      <p>Intercoms, doorbells, and smart locks require manual interaction or proprietary apps.</p>
+      <div class="status">Fragmented protocols</div>
+    </div>
+    <div class="problem-cell">
+      <div class="icon">🛗</div>
+      <h3>Elevators</h3>
+      <p>Every manufacturer has a different API. Otis, KONE, Schindler — three integrations, three contracts.</p>
+      <div class="status">Proprietary silos</div>
+    </div>
+    <div class="problem-cell">
+      <div class="icon">📦</div>
+      <h3>Lockers & containers</h3>
+      <p>Package lockers, waste containers, charging stations — each with its own incompatible system.</p>
+      <div class="status">No interoperability</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROTOCOL ═══ -->
+<section id="protocol">
+  <div class="section-label">02 — The Protocol</div>
+  <h2 class="section-title">One protocol. Every node.<br>Every emitter.</h2>
+  <p class="section-desc">URBANODE is a universal R2I (Robot-to-Infrastructure) communication protocol. Integrate once, communicate with any certified node.</p>
+
+  <div class="flow-container">
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 01</div>
+      <div class="flow-step">
+        <h3>Discovery</h3>
+        <p>Emitter queries the geospatial registry for nearby nodes. Receives real-time operational state: traffic phase, door status, elevator floor, available lockers.</p>
+        <div class="tech">GEOSPATIAL REGISTRY · BLE BROADCAST · DNS-SD/mDNS</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 02</div>
+      <div class="flow-step">
+        <h3>Proximity verification</h3>
+        <p>Node verifies the emitter is physically present using short-range wireless. GPS spoofing is blocked by an independent measurement layer.</p>
+        <div class="tech">BLE RSSI · UWB TIME-OF-FLIGHT · NFC FIELD PRESENCE</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 03</div>
+      <div class="flow-step">
+        <h3>Mutual authentication</h3>
+        <p>Both emitter and node present ECDSA P-256 certificates verified against the system root of trust. Compromised emitters are revoked network-wide in under 60 seconds.</p>
+        <div class="tech">TLS 1.3 · mTLS · ECDSA P-256 · CRL &lt;60s</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 04</div>
+      <div class="flow-step">
+        <h3>5D permission evaluation</h3>
+        <p>Permissions are evaluated as a five-dimensional matrix: action type × node type × geographic zone × time window × permission level.</p>
+        <div class="tech">ACTION · NODE TYPE · ZONE · TIME · LEVEL (1-5)</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 05</div>
+      <div class="flow-step">
+        <h3>Embedded safety — node is final authority</h3>
+        <p>Safety rules execute locally on the node and cannot be overridden by any external request. Fire alarm active → door stays locked. Emergency preemption → traffic signal rejects phase change. The node always has the last word.</p>
+        <div class="tech">LOCAL EVALUATION · IMMUTABLE RULES · AUDIT LOG 90d</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-step-num">STEP 06</div>
+      <div class="flow-step">
+        <h3>Execution & settlement</h3>
+        <p>Action executes. Signed confirmation returned. Interaction recorded for automatic billing between operators and infrastructure owners.</p>
+        <div class="tech">SIGNED CONFIRMATION · AUTOMATIC SETTLEMENT · USAGE ANALYTICS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ARCHITECTURE ═══ -->
+<section>
+  <div class="section-label">03 — Architecture</div>
+  <h2 class="section-title">Three components. Zero hardware.</h2>
+  <p class="section-desc">URBANODE is pure software. No proprietary devices to manufacture, deploy, or maintain. Existing infrastructure gets upgraded via firmware update.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-layers">
+      <div class="arch-layer">
+        <div class="arch-layer-label">Emitters</div>
+        <div class="arch-layer-items">
+          <span class="arch-tag">SDK Emitter (~100KB)</span>
+          <span class="arch-tag">discover()</span>
+          <span class="arch-tag">request()</span>
+          <span class="arch-tag">status()</span>
+        </div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Platform</div>
+        <div class="arch-layer-items">
+          <span class="arch-tag">Certificate Authority</span>
+          <span class="arch-tag">Geospatial Registry</span>
+          <span class="arch-tag">Permission Engine</span>
+          <span class="arch-tag">Settlement</span>
+          <span class="arch-tag">Monitoring</span>
+          <span class="arch-tag">Digital Twin</span>
+          <span class="arch-tag">Routing</span>
+        </div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Nodes</div>
+        <div class="arch-layer-items">
+          <span class="arch-tag">SDK Receiver (~100KB)</span>
+          <span class="arch-tag">Embedded Safety</span>
+          <span class="arch-tag">State Reporting</span>
+          <span class="arch-tag">Adapter Layer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NODES ═══ -->
+<section id="nodes">
+  <div class="section-label">04 — Coverage</div>
+  <h2 class="section-title">Street to apartment door.</h2>
+  <p class="section-desc">Every type of urban infrastructure an autonomous emitter encounters on its journey.</p>
+
+  <div class="nodes-grid">
+    <div class="node-card">
+      <div class="node-icon">🚦</div>
+      <h4>Traffic Signals</h4>
+      <div class="node-code">TRAFFIC_SIGNAL</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🚪</div>
+      <h4>Building Access</h4>
+      <div class="node-code">BUILDING_ACCESS</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🛗</div>
+      <h4>Elevators</h4>
+      <div class="node-code">ELEVATOR</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🔔</div>
+      <h4>Doorbells</h4>
+      <div class="node-code">DOORBELL</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🔐</div>
+      <h4>Smart Locks</h4>
+      <div class="node-code">SMART_LOCK</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🚧</div>
+      <h4>Barriers</h4>
+      <div class="node-code">BARRIER</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">♿</div>
+      <h4>Ramps</h4>
+      <div class="node-code">RAMP</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">🗑️</div>
+      <h4>Waste Containers</h4>
+      <div class="node-code">WASTE_CONTAINER</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">📦</div>
+      <h4>Package Lockers</h4>
+      <div class="node-code">PACKAGE_LOCKER</div>
+    </div>
+    <div class="node-card">
+      <div class="node-icon">⚡</div>
+      <h4>Charging Stations</h4>
+      <div class="node-code">CHARGING_STATION</div>
+    </div>
+  </div>
+
+  <!-- Emitters -->
+  <h2 class="section-title" style="margin-top:4rem;">Compatible emitters.</h2>
+  <div class="emitters-row">
+    <div class="emitter-card">
+      <div class="em-icon">🤖</div>
+      <h4>Delivery Robots</h4>
+      <p>Sidewalk delivery</p>
+    </div>
+    <div class="emitter-card">
+      <div class="em-icon">🦾</div>
+      <h4>Humanoid Robots</h4>
+      <p>Service & logistics</p>
+    </div>
+    <div class="emitter-card">
+      <div class="em-icon">🛸</div>
+      <h4>Drones</h4>
+      <p>Aerial delivery</p>
+    </div>
+    <div class="emitter-card">
+      <div class="em-icon">♿</div>
+      <h4>Accessibility</h4>
+      <p>Assisted mobility</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECURITY ═══ -->
+<section id="security">
+  <div class="section-label">05 — Security</div>
+  <h2 class="section-title">The node is the final authority.</h2>
+  <p class="section-desc">No external request can override embedded safety rules. The physical device always has the last word.</p>
+
+  <div class="security-features">
+    <div class="sec-card">
+      <div class="sec-badge">Authentication</div>
+      <h4>Mutual TLS 1.3</h4>
+      <p>Both emitter and node verify each other's identity through ECDSA P-256 certificates. Compromised emitters revoked in &lt;60 seconds across the entire network.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-badge">Proximity</div>
+      <h4>Anti-spoofing</h4>
+      <p>Physical presence verified through BLE, UWB, or NFC — independent of GPS. Multi-technology simultaneous verification available.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-badge">Embedded</div>
+      <h4>Safety-first logic</h4>
+      <p>Fire alarm → door stays locked. Emergency vehicle → signal rejects override. Elevator at capacity → call denied. Rules are immutable and local.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-badge">Reputation</div>
+      <h4>Dynamic scoring</h4>
+      <p>Each emitter earns a reputation score based on denial rates, safety triggers, and anomalous patterns. Higher risk = stricter verification.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-badge">Offline</div>
+      <h4>Autonomous operation</h4>
+      <p>Nodes cache certificates and CRLs locally. Full protocol execution continues during platform disconnection. Emitters bridge connectivity for offline nodes.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-badge">Audit</div>
+      <h4>Immutable logging</h4>
+      <p>Every interaction — every decision, every denial — is logged with tamper-proof retention for a minimum of 90 days.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DATA PLATFORM ═══ -->
+<section>
+  <div class="section-label">06 — Data Layer</div>
+  <h2 class="section-title">Infrastructure intelligence<br>that doesn't exist today.</h2>
+  <p class="section-desc">Every R2I interaction generates real-time operational data. Data that no navigation platform has access to.</p>
+
+  <div class="data-section">
+    <h3>Real-time urban infrastructure state</h3>
+    <p>URBANODE creates a synchronized digital twin of connected infrastructure — queryable by authorized entities, updated in real time.</p>
+    <div class="data-list">
+      <div class="data-list-item">Traffic signal phase & time remaining</div>
+      <div class="data-list-item">Building door open / locked / blocked</div>
+      <div class="data-list-item">Elevator floor, direction & capacity</div>
+      <div class="data-list-item">Package locker availability</div>
+      <div class="data-list-item">Charging station status</div>
+      <div class="data-list-item">Waste container fill level</div>
+      <div class="data-list-item">Ramp activation state</div>
+      <div class="data-list-item">Predictive maintenance alerts</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ACCESSIBILITY ═══ -->
+<section>
+  <div class="section-label">07 — Accessibility</div>
+  <h2 class="section-title">Same protocol. Same nodes.<br>For people who need it most.</h2>
+  <p class="section-desc">Assistive devices for people with reduced mobility can register with an accessibility certificate — using the same infrastructure, the same security layers, with priority queuing and extended pedestrian phases. No additional hardware. EU Directive 2019/882 compliant data.</p>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact" class="contact-section">
+  <div class="section-label">Get in touch</div>
+  <h2 class="section-title">Build the R2I standard together.</h2>
+  <p class="section-desc">URBANODE is seeking integration partners — robot operators, infrastructure manufacturers, and smart city platforms.</p>
+  <a href="mailto:contact@urbanode.io" class="contact-email">contact@urbanode.io</a>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-left">© 2026 URBANODE · Patent Pending · OEPM ES</div>
+  <div class="footer-right">
+    <span class="live">Protocol v0.2</span>
+    <span>R2I Standard</span>
+  </div>
+</footer>
+
+</body>
+</html>
